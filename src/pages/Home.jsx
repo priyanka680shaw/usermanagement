@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import UserForm from "../components/UserForm";
 import { Link } from "react-router-dom";
-// loader
 import ClipLoader from "react-spinners/ClipLoader";
 
 function Home() {
@@ -10,30 +9,15 @@ function Home() {
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
 
-  // Fetch users from API
+  // Fetch users
   useEffect(() => {
     fetch("https://jsonplaceholder.typicode.com/users")
       .then((res) => res.json())
-      .then((data) => {
-        setUsers(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching users:", err);
-        setLoading(false);
-      });
+      .then((data) => setUsers(data))
+      .finally(() => setLoading(false));
   }, []);
 
-  // Handle deleting a user
-  const handleDelete = (id) => {
-    fetch(`https://jsonplaceholder.typicode.com/users/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => setUsers(users.filter((user) => user.id !== id)))
-      .catch((err) => console.error(err));
-  };
-
-  // Handle adding a new user
+  // Add new user
   const handleAddUser = (newUser) => {
     fetch("https://jsonplaceholder.typicode.com/users", {
       method: "POST",
@@ -42,13 +26,12 @@ function Home() {
     })
       .then((res) => res.json())
       .then((data) => {
-        setUsers([...users, data]);
+        setUsers([...users, { ...data, id: Date.now() }]); // temporary ID for local state
         setShowForm(false);
-      })
-      .catch((err) => console.error(err));
+      });
   };
 
-  // Handle updating an existing user
+  // Update user
   const handleUpdateUser = (updatedUser) => {
     fetch(`https://jsonplaceholder.typicode.com/users/${updatedUser.id}`, {
       method: "PUT",
@@ -57,31 +40,33 @@ function Home() {
     })
       .then((res) => res.json())
       .then((data) => {
-        setUsers(users.map((user) => (user.id === data.id ? data : user)));
+        setUsers(
+          users.map((user) => (user.id === updatedUser.id ? updatedUser : user))
+        );
         setEditingUser(null);
-      })
+      });
+  };
+
+  // Delete user
+  const handleDelete = (id) => {
+    fetch(`https://jsonplaceholder.typicode.com/users/${id}`, {
+      method: "DELETE",
+    })
+      .then(() => setUsers(users.filter((user) => user.id !== id)))
       .catch((err) => console.error(err));
   };
 
-  // if (loading) return <p className="text-center mt-4">Loading...</p>;
-
-
- // Loader when fetching spinner
- 
-  if (loading) {
-  return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
-      <ClipLoader color="#36d7b7" size={60} />
-    </div>
-  );
-}
-
+  if (loading)
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <ClipLoader color="#36d7b7" size={60} />
+      </div>
+    );
 
   return (
     <div className="container mt-4 text-center">
       <h1 className="mb-3">User Management System</h1>
 
-      {/* Adding User Button */}
       <button
         className="btn btn-primary mb-3"
         onClick={() => setShowForm(!showForm)}
@@ -89,18 +74,28 @@ function Home() {
         {showForm ? "Close Form" : "Add User"}
       </button>
 
-      {/* Adding User Form */}
-      {showForm && <UserForm onSubmit={handleAddUser} />}
+      {/* Add Form */}
+      {showForm && (
+        <UserForm
+          user={null}
+          onSubmit={handleAddUser}
+          onCancel={() => setShowForm(false)}
+        />
+      )}
 
-      {/* Editing User Form */}
+      {/* Edit Form */}
       {editingUser && (
         <div className="mt-4">
           <h2>Edit User</h2>
-          <UserForm user={editingUser} onSubmit={handleUpdateUser} />
+          <UserForm
+            user={editingUser}
+            onSubmit={handleUpdateUser}
+            onCancel={() => setEditingUser(null)}
+          />
         </div>
       )}
 
-      {/* creating user data Table */}
+      {/* Users Table */}
       <div className="table-responsive mt-4">
         <table className="table table-bordered table-striped table-hover">
           <thead className="table-dark text-center">

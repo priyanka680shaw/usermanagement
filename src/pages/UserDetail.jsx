@@ -1,32 +1,55 @@
- import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import UserForm from "../components/UserForm";
+import { useState, useEffect } from "react";
 
-function UserDetail() {
-  const { id } = useParams();
-  console.log(id)
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+function UserForm({ user, onSubmit }) {
+  const [name, setName] = useState(user ? user.name : "");
+  const [email, setEmail] = useState(user ? user.email : "");
+  const [phone, setPhone] = useState(user ? user.phone : "");
 
+  // Update form when editing a new user
   useEffect(() => {
-    fetch(`https://jsonplaceholder.typicode.com/users/${id}`)
-      .then((res) => res.json())
-      .then((data) => setUser(data))
-      .catch((err) => console.error(err));
-  }, [id]);
+    if (user) {
+      setName(user.name);
+      setEmail(user.email);
+      setPhone(user.phone);
+    }
+  }, [user]);
 
-  const handleUpdate = (updatedUser) => {
-    fetch(`https://jsonplaceholder.typicode.com/users/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(updatedUser),
-      headers: { "Content-type": "application/json; charset=UTF-8" },
-    })
-      .then((res) => res.json())
-      .then(() => navigate("/"))
-      .catch((err) => console.error(err));
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit({ ...user, name, email, phone });
   };
 
-  return user ? <UserForm user={user} onSubmit={handleUpdate} /> : <p>Loading...</p>;
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="name"
+        value={name}  // controlled input
+        onChange={(e) => setName(e.target.value)}
+        className="form-control mb-2"
+        required
+      />
+      <input
+        type="email"
+        placeholder="Email"
+        value={email} // controlled input
+        onChange={(e) => setEmail(e.target.value)}
+        className="form-control mb-2"
+        required
+      />
+      <input
+        type="text"
+        placeholder="Phone"
+        value={phone} // controlled input
+        onChange={(e) => setPhone(e.target.value)}
+        className="form-control mb-2"
+        required
+      />
+      <button type="submit" className="btn btn-success">
+        {user ? "Update User" : "Add User"}
+      </button>
+    </form>
+  );
 }
 
-export default UserDetail;
+export default UserForm;
