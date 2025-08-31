@@ -24,7 +24,7 @@ function UserForm({ user, onSubmit }) {
       <input
         type="text"
         placeholder="name"
-        value={name}  // controlled input
+        value={name}  
         onChange={(e) => setName(e.target.value)}
         className="form-control mb-2"
         required
@@ -32,7 +32,7 @@ function UserForm({ user, onSubmit }) {
       <input
         type="email"
         placeholder="Email"
-        value={email} // controlled input
+        value={email} 
         onChange={(e) => setEmail(e.target.value)}
         className="form-control mb-2"
         required
@@ -40,7 +40,7 @@ function UserForm({ user, onSubmit }) {
       <input
         type="text"
         placeholder="Phone"
-        value={phone} // controlled input
+        value={phone} 
         onChange={(e) => setPhone(e.target.value)}
         className="form-control mb-2"
         required

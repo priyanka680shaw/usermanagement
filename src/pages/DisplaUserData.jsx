@@ -26,7 +26,7 @@ function DisplayUserData() {
     fetchUser();
   }, [id]);
 
-  // if (!userData) return <p className="text-center mt-4">Loading user data...</p>;
+ //loder 
 if (!userData) {
   return (
     <div className="d-flex justify-content-center align-items-center vh-100">
@@ -37,7 +37,7 @@ if (!userData) {
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light px-2">
-      {/* Use responsive column widths */}
+      
       <div className="card shadow-sm w-100" style={{ maxWidth: "24rem" }}>
         <div className="card-header bg-dark text-white text-center">
           <h5 className="mb-0">User Details</h5>
